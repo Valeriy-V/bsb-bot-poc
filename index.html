@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Сканер штрих-кодів</title>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #f2f2f2;
+        }
+        #reader {
+            width: 100%;
+            max-width: 320px;
+            margin: auto;
+        }
+        h2 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+<h2>Скануйте штрих-код 📷</h2>
+<div id="reader"></div>
+
+<script>
+    const telegram = window.Telegram.WebApp;
+    telegram.ready();
+
+    function onScanSuccess(decodedText, decodedResult) {
+        console.log(`Зчитано код: ${decodedText}`);
+        telegram.sendData(decodedText);
+        telegram.close();
+    }
+
+    function onScanFailure(error) {
+        console.warn(`Помилка: ${error}`);
+    }
+
+    const html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader",
+        { fps: 10, qrbox: { width: 250, height: 250 } }
+    );
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+</script>
+</body>
+</html>
