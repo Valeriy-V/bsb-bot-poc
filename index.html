@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <title>Scanner</title>
     <script src="https://unpkg.com/html5-qrcode"></script> <!-- бібліотека сканера -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+
 </head>
 <body>
 <h1>Сканер штрих-коду</h1>
@@ -12,6 +15,9 @@
 <div id="reader" style="width: 300px; height: 300px;"></div>
 
 <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const webApp = window.Telegram.WebApp;
+        webApp.ready();
     const html5QrCode = new Html5Qrcode("reader"); // зв'язуємо з div#reader
 
     Html5Qrcode.getCameras().then(devices => {
@@ -35,6 +41,7 @@
         }
     }).catch(err => {
         console.error(err);
+    });
     });
 </script>
 </body>
