@@ -1,53 +1,41 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Сканер штрих-кодів</title>
-    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-            background-color: #f2f2f2;
-        }
-        #reader {
-            width: 100%;
-            max-width: 320px;
-            margin: auto;
-        }
-        h2 {
-            color: #333;
-        }
-    </style>
+    <title>Scanner</title>
+    <script src="https://unpkg.com/html5-qrcode"></script> <!-- бібліотека сканера -->
 </head>
 <body>
-<h2>Скануйте штрих-код 📷</h2>
-<div id="reader"></div>
+<h1>Сканер штрих-коду</h1>
+
+<!-- ВАЖЛИВО! Це контейнер для камери -->
+<div id="reader" style="width: 300px; height: 300px;"></div>
 
 <script>
-    const telegram = window.Telegram.WebApp;
-    telegram.ready();
+    const html5QrCode = new Html5Qrcode("reader"); // зв'язуємо з div#reader
 
-    function onScanSuccess(decodedText, decodedResult) {
-        console.log(`Зчитано код: ${decodedText}`);
-        telegram.sendData(decodedText);
-        telegram.close();
-    }
+    Html5Qrcode.getCameras().then(devices => {
+        if (devices && devices.length) {
+            let cameraId = devices[0].id;
 
-    function onScanFailure(error) {
-        console.warn(`Помилка: ${error}`);
-    }
-
-    const html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader",
-        { fps: 10, qrbox: { width: 250, height: 250 },
-            experimentalFeatures: {
-                useBarCodeDetectorIfSupported: true // використовувати детектор штрихкодів
-            },
-            supportedScanTypes: [ Html5QrcodeScanType.SCAN_TYPE_CAMERA ] }
-    );
-    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+            html5QrCode.start(
+                { facingMode: "environment" }, // задня камера
+                {
+                    fps: 10,    // кадрів на секунду
+                    qrbox: { width: 250, height: 250 }  // розмір вікна сканування
+                },
+                (decodedText, decodedResult) => {
+                    console.log(`Код знайдено: ${decodedText}`);
+                    Telegram.WebApp.sendData(decodedText); // відправляємо результат назад у бота
+                },
+                (errorMessage) => {
+                    console.warn(`Помилка сканування: ${errorMessage}`);
+                }
+            );
+        }
+    }).catch(err => {
+        console.error(err);
+    });
 </script>
 </body>
 </html>
